@@ -52,7 +52,7 @@ From [Intense Debate](http://intensedebate.com/userDash) Dashboard navigate to y
 Of course you can! But before installing ID to your WP blog, make sure to run this plugin once! Else the comments for older posts won't appear!
 
 = How can I move my Blogger Blog to WP without changing the Permalink structure? =
-Quite offtopic! But still... [HERE](http://devilsworkshop.org/moving-from-blogger-to-wordpress-maintaining-permalinks-traffic-seo/) is the perfect guide for you! Even I have followed the same.
+Quite offtopic! But still... [here](http://devilsworkshop.org/moving-from-blogger-to-wordpress-maintaining-permalinks-traffic-seo/) is the perfect guide for you! Even I have followed the same.
 
 = So if I maintain the Permalinks, will the existing Intense Debate Account work? =
 Quite intelligent question! Even I thought the same. But the reality is it won't work! When you install ID comment system from Blogger to WP then the comments according to the Permalink, remains stored inside ID database, not on WP database. So the comments would come on widgets by Intense Debate. But won't be shown on the actual post pages. So, you should import the comments, then use delete the existing ID site, then reinstall to make it fully compatible!
@@ -63,10 +63,14 @@ You can check our Blog... [InTechgrity](http://www.intechgrity.com/?p=267)
 
 == ChangeLog ==
 
-= Version 1.0.1 =
+= Version 1.1 (xx-08-2010) =
+* Added the ability to translate the plugin
+* Cleanup of code
 
+= Version 1.0.1 (11-08-2010) =
 * Initial release!
 
 == Upgrade Notice ==
+
 = 1.0.1 =
-The initial release! That's why!!!! *PS: I wouldn have included this if WP validator had not notified me that I am missing this section!*
+Initial Release
