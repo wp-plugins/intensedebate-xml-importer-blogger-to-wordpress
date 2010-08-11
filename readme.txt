@@ -1,12 +1,12 @@
 === IntenseDebate XML Importer (Blogger to Wordpress) ===
 Contributors: Swashata, GautamGupta
 Donate link: http://www.intechgrity.com/about/buy-us-some-beer/
-Tags: intense debate, id import, intense debate comment import, blogger to wordpress comment import
+Tags: intense debate, import, importer, blogger, wordpress
 Requires at least: 2.8
 Tested up to: 3.0.1
-Stable tag: trunk
+Stable tag: 1.0.1
 
-Import all Comments from Blogger Intense Debate account to Wordpress
+Import all comments from Blogger Intense Debate account to WordPress.
 
 == Description ==
 
