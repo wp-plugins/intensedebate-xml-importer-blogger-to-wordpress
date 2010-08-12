@@ -3,7 +3,7 @@
 Plugin Name: IntenseDebate XML Importer (Blogger -> Wordpress)
 Plugin URI: http://www.intechgrity.com/?p=267
 Description: Move your intense debate comments from blogspot to wordpress using the Intense Debate XML Export file. <a href="options-general.php?page=id_import_blg_wpitg">Click here to get started</a>. The comparison is made on the Title basis! Although it is now possible to <a href="http://devilsworkshop.org/moving-from-blogger-to-wordpress-maintaining-permalinks-traffic-seo/" target="_blank">Migrate to WP from Blogger</a> without loosing a single Permalink or SEO, I preferred the original algorithm by previous author. This is a derivative work of <a href="http://blog.intensedebate.com/2010/02/09/blogger-to-wordpress/">blogspot2wp</a> Plugin made by Josh Fraser.
-Version: 1.0.2
+Version: 1.0.3
 Author: Swashata
 Author URI: http://www.swashata.me/
 License: GPL2
@@ -103,9 +103,9 @@ function id_xml_importer_import_comment() {
 				if ( $comment_postID ) {
 					
 					/**
-					 *Tell the user that we have got a post
-					 *We will use the get_permalink
-					 */
+					 * Tell the user that we have got a post
+					 * We will use the get_permalink
+					*/
 					
 					$post_permalink = get_permalink( $comment_postID );
 					
@@ -135,7 +135,7 @@ function id_xml_importer_import_comment() {
 						/**
 						 * Don't add duplicate comments
 						 * We will check on the basis of comment_name, comment_text and comment_url for the current post
-						*/
+						 */
 						
 						if ( !id_xml_importer_dup_comment($comment->name, $comment->text, $comment->url, $comment_postID ) ) {
 							$comment_ID = wp_insert_comment( $commentdata ); 
@@ -148,7 +148,7 @@ function id_xml_importer_import_comment() {
 					$post_count++;
 				}
 				else {
-					echo "\n" . _e('Sorry... Could not find a post for this title', 'id-sml-import') . "\n";
+					echo "\n" . __( 'Sorry... Could not find a post for this title', 'id-sml-import' ) . "\n";
 				}
 				
 				echo "\t" . sprintf( __ngettext( 'Imported %1$d/%2$d comment for this post', 'Imported %1$d/%2$d comments for this post', $per_post_comment_count, 'id-xml-import' ), $per_post_comment_count, $per_post_total_comment );
