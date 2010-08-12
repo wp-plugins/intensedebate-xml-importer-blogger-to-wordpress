@@ -63,7 +63,14 @@ You can check our Blog... [InTechgrity](http://www.intechgrity.com/?p=267)
 
 == ChangeLog ==
 
-= Version 1.1 (xx-08-2010) =
+= Version 1.0.3 (12-08-2010) =
+* It will show the link to the post where the comments have been imported
+* Will give a more precise result on how many comments out of the found comments have been imported to a particular post
+* Will also showthe total number of posts and comments found on the uplaoded XML file
+* Finds duplicated comments on the name, email and content basis. Removes the IP test and URL test. Dont know why, but Intense Debate shows a blank URL. So removed the URL test.
+* While finding duplicate Comments instead of perfect match I now use a MySQL Like method. It minimizes the chances of getting duplicate comments
+
+= Version 1.0.2 (11-08-2010) =
 * Added the ability to translate the plugin
 * Cleanup of code
 
@@ -71,6 +78,11 @@ You can check our Blog... [InTechgrity](http://www.intechgrity.com/?p=267)
 * Initial release!
 
 == Upgrade Notice ==
+= 1.0.3 =
+The plugin would show exact results when importing comments.
+
+= 1.0.2 =
+Made the plugin at per with Wordpress Coding standard and added internationalization. Thanks to Gautam
 
 = 1.0.1 =
 Initial Release

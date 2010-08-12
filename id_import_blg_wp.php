@@ -120,11 +120,11 @@ function id_xml_importer_import_comment() {
 						/* Actually insert the comment into WordPress */
 						$commentdata['user_id']			= 0;
 						$commentdata['comment_agent']		= '';
-						$commentdata['comment_author']		= $comment->name;
-						$commentdata['comment_content']		= $comment->text;
+						$commentdata['comment_author']		= addslashes( $comment->name );
+						$commentdata['comment_content']		= addslashes( $comment->text );
 						$commentdata['comment_author_IP']	= $comment->ip;
-						$commentdata['comment_author_url']	= $comment->url;
-						$commentdata['comment_author_email']	= $comment->email;
+						$commentdata['comment_author_url']	= addslashes( $comment->url );
+						$commentdata['comment_author_email']	= addslashes( $comment->email );
 						$commentdata				= apply_filters( 'preprocess_comment', $commentdata );
 						$commentdata['comment_post_ID']		= (int) $comment_postID;
 						$commentdata['comment_date']		= $comment->date;
@@ -137,7 +137,7 @@ function id_xml_importer_import_comment() {
 						 * We will check on the basis of comment_name, comment_text and comment_url for the current post
 						 */
 						
-						if ( !id_xml_importer_dup_comment($comment->name, $comment->text, $comment->url, $comment_postID ) ) {
+						if ( !id_xml_importer_dup_comment($commentdata['comment_author'], $commentdata['comment_content'], $commentdata['comment_author_email'], $comment_postID ) ) {
 							$comment_ID = wp_insert_comment( $commentdata ); 
 							do_action( 'comment_post', $comment_ID, $commentdata['comment_approved'] );
 							$comment_count++;
@@ -164,8 +164,10 @@ function id_xml_importer_import_comment() {
 			echo '<div class="updated fade">' . sprintf( __( 'Found a total of %d Posts and %d Comments from your uploaded XML File', 'id-xml-import'), $total_post, $total_comment ) . '</div>';
 		} else {
 			if ( $_FILES['id_xml']['type'] != 'text/xml' )	echo '<p>' . __( 'Uplaoded file was not a valid XML file', 'id-xml-import' ) . '</p>';
-			if ( $_FILES['id_xml']['error'] != 0 )		echo '<p>' . __( 'There was some error uploading the file', 'id-xml-import' ) . '<br />' . $_FILES['id_xml']['error'] . '</p>';
+			if ( $_FILES['id_xml']['error'] != 0 )		echo '<p>' . __( 'There was some error uploading the file', 'id-xml-import' ) . '<br />' . __( 'Error Code: ') . $_FILES['id_xml']['error'] . '</p>';
 			if ( empty( $_FILES['id_xml'] ) )		echo '<p>' . __( 'No file uploaded', 'id-xml-import' ) . '</p>';
+			
+			echo '<p>' . sprintf( __( ' Please <a href="%s">Retry</a>', 'id-xml-import' ), "options-general.php?page=id_import_blg_wpitg" ) . '</p>';
 		}
 	} else {
 	?>
@@ -196,10 +198,11 @@ function id_xml_importer_import_comment() {
  *
  * @return bool Whether a duplicate comment was found or not TRUE if found FALSE if not
  */
-function id_xml_importer_dup_comment( $author, $comment, $url, $postid ) {
+function id_xml_importer_dup_comment( $author, $comment, $email, $postid ) {
 	global $wpdb;
 	
-	$sql = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND (comment_type='comment' OR comment_type='') AND comment_author = '%s' AND comment_author_url = '%s' AND comment_content = '%s' LIMIT 1", $postid, $author, $url, $comment );
+	$sql = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND (comment_type='comment' OR comment_type='') AND comment_author = %s AND comment_author_email = %s AND comment_content LIKE %s LIMIT 1", $postid, $author, $email, '%'.$comment.'%' );
+	
 	if ( $wpdb->get_var( $sql ) )
 		return true;
 	
