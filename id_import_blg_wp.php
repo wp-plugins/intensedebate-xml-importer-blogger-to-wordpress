@@ -77,10 +77,10 @@ function id_xml_importer_import_comment() {
 			
 			// loop through each blogpost
 			foreach( $comments as $post ) {
-				/*Increment the $total_post*/
+				/* Increment the $total_post */
 				$total_post++;
 				
-				/*Make this post comment and valid comments 0 and find post title */
+				/* Make this post comment and valid comments 0 and find post title */
 				$per_post_comment_count = $per_post_total_comment = 0;
 				$post_title = $post->title;
 				
@@ -89,11 +89,11 @@ function id_xml_importer_import_comment() {
 				/* Look ahead and get the date of the first comment */
 				$date_of_first_comment = strtotime( $post->comments->comment->gmt );
 				
-				/*
+				/**
 				 Lookup the post ID using the title of the blogpost
 				 if there are multiple blog posts with the same title
 				 choose the one with the date closest to the first comment
-				*/
+				 */
 				$query = $wpdb->prepare( "SELECT ID, ABS(%s - UNIX_TIMESTAMP(post_date_gmt)) AS nearest_date FROM $wpdb->posts WHERE post_title = %s ORDER BY nearest_date LIMIT 1", $date_of_first_comment, $post_title );
 				
 				if( $results = $wpdb->get_results( $query ) )
@@ -105,7 +105,7 @@ function id_xml_importer_import_comment() {
 					/**
 					 * Tell the user that we have got a post
 					 * We will use the get_permalink
-					*/
+					 */
 					
 					$post_permalink = get_permalink( $comment_postID );
 					

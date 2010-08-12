@@ -4,7 +4,7 @@ Donate link: http://www.intechgrity.com/about/buy-us-some-beer/
 Tags: intense debate, import, importer, blogger, wordpress
 Requires at least: 2.8
 Tested up to: 3.0.1
-Stable tag: 1.0.1
+Stable tag: 1.0.3
 
 Import all comments from Blogger Intense Debate account to WordPress.
 
