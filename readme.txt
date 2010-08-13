@@ -4,7 +4,7 @@ Donate link: http://www.intechgrity.com/about/buy-us-some-beer/
 Tags: intense debate, import, importer, blogger, wordpress
 Requires at least: 2.8
 Tested up to: 3.0.1
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 
 Import all comments from Blogger Intense Debate account to WordPress.
 
@@ -42,6 +42,9 @@ This is pretty much straight forward...
 *   Once done check your blog... If there remains some error then you have to fix that manually! In future release we may add some automated option
 *   Finally disabled the Plugin! Hey... You need it only once ;)
 
+###Upgrading the Plugin###
+
+So far we have released a few versions of this plugin. You can just deactivate and delete old version and install the latest one from here
 
 == Frequently Asked Questions ==
 
@@ -62,6 +65,11 @@ Quite intelligent question! Even I thought the same. But the reality is it won't
 You can check our Blog... [InTechgrity](http://www.intechgrity.com/?p=267)
 
 == ChangeLog ==
+= Version 1.0.4 (13-08-2010) =
+* Added a simulation mode to test the import result without actually inserting the comments to the database
+* Fixed the duplicate comment bug a little more
+* Now the plugin will tell you how much memory it has used. Useful for people on shared hosting.
+* Set the time limit to 0 (unlimited) to avoid timeout error
 
 = Version 1.0.3 (12-08-2010) =
 * It will show the link to the post where the comments have been imported
@@ -78,6 +86,9 @@ You can check our Blog... [InTechgrity](http://www.intechgrity.com/?p=267)
 * Initial release!
 
 == Upgrade Notice ==
+= 1.0.4 =
+Added simulation mode, would show memory usage and fixed some bug.
+
 = 1.0.3 =
 The plugin would show exact results when importing comments.
 
