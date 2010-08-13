@@ -3,7 +3,7 @@
 Plugin Name: IntenseDebate XML Importer (Blogger -> Wordpress)
 Plugin URI: http://www.intechgrity.com/?p=267
 Description: Move your intense debate comments from blogspot to wordpress using the Intense Debate XML Export file. <a href="options-general.php?page=id_import_blg_wpitg">Click here to get started</a>. The comparison is made on the Title basis! Although it is now possible to <a href="http://devilsworkshop.org/moving-from-blogger-to-wordpress-maintaining-permalinks-traffic-seo/" target="_blank">Migrate to WP from Blogger</a> without loosing a single Permalink or SEO, I preferred the original algorithm by previous author. This is a derivative work of <a href="http://blog.intensedebate.com/2010/02/09/blogger-to-wordpress/">blogspot2wp</a> Plugin made by Josh Fraser.
-Version: 1.0.4
+Version: 1.0.5
 Author: Swashata
 Author URI: http://www.swashata.me/
 License: GPL2
@@ -67,24 +67,41 @@ function id_xml_importer_import_comment() {
 			set_time_limit( 0 );
 			
 			if( 1 == $_POST['id_xml_sim'] ) {
-				echo '<div class="error fade">' . sprintf( __( 'Simulation mode is on. No comments actually imported. Click <a href="">HERE</a> to start again', 'id-xml-importer' ), '' ) . '</div>';
+				echo '<div class="error fade">' . sprintf( __( 'Simulation mode is on. No comments have actually been imported. Click <a href="">HERE</a> to start again', 'id-xml-importer' ), '' ) . '</div>';
 			}
 			echo '<h3>' . __( 'Import Result', 'id-xml-importer' ) . '</h3><pre style="height: 400px; overflow: scroll; border: 1px dotted #333; padding: 10px">';
 			
+			/** Initialize the variables */
 			$post_count = $comment_count = $per_post_comment_count = $per_post_total_comment = $total_post = $total_comment = 0;
 			
 			$comments = simplexml_load_file( $_FILES['id_xml']['tmp_name'] );
+			
+			$search_op = (int) $_POST['id_xml_op'];
+			if( $search_op != 1 && $search_op != 2 )
+				$search_op = 2;
 			
 			// loop through each blogpost
 			foreach( $comments as $post ) {
 				/* Increment the $total_post */
 				$total_post++;
 				
+				/** Unset comment_postID */
+				if( isset( $comment_postID ) )
+					unset( $comment_postID );
+				
+				
 				/* Make this post comment and valid comments 0 and find post title */
 				$per_post_comment_count = $per_post_total_comment = 0;
-				$post_title = $post->title;
+				$post_title = trim($post->title);
 				
 				echo "\n\n\n" . sprintf( __( 'Trying to import for title %s', 'id-import-xml' ), "<strong><big>$post_title</big></strong>" ) . "\n";
+				
+				/**
+				 * Count the total comments in the loop
+				 */
+				$per_post_total_comment = count( $post->comments->comment );
+				
+				$total_comment = $total_comment + $per_post_total_comment;
 				
 				/* Look ahead and get the date of the first comment */
 				$date_of_first_comment = strtotime( $post->comments->comment->gmt );
@@ -93,9 +110,25 @@ function id_xml_importer_import_comment() {
 				 Lookup the post ID using the title of the blogpost
 				 if there are multiple blog posts with the same title
 				 choose the one with the date closest to the first comment
+				 Also we will perform the query according to the user
 				 */
+				switch( $search_op ) {
+					default :
+					case 2 :
+						/** For smart query
+						* ID lefts a space for special characters like +
+						* So replace double space with a single
+						*/
+					       $query_post_title = str_ireplace( '  ', ' ', $post_title );
+					       
+						$query = $wpdb->prepare( "SELECT ID, ABS(%s - UNIX_TIMESTAMP(post_date_gmt)) AS nearest_date FROM $wpdb->posts WHERE post_title LIKE %s AND post_status = 'publish' AND post_type = 'post' ORDER BY nearest_date LIMIT 1", $date_of_first_comment, $query_post_title . '%' );
+						break;
+					case 1 :
+						$query = $wpdb->prepare( "SELECT ID, ABS(%s - UNIX_TIMESTAMP(post_date_gmt)) AS nearest_date FROM $wpdb->posts WHERE post_title = %s AND post_status = 'publish' AND post_type = 'post' ORDER BY nearest_date LIMIT 1", $date_of_first_comment, $post_title );
+						break;
+				}
 				
-				$query = $wpdb->prepare( "SELECT ID, ABS(%s - UNIX_TIMESTAMP(post_date_gmt)) AS nearest_date FROM $wpdb->posts WHERE post_title = %s AND post_status = 'publish' AND post_type = 'post' ORDER BY nearest_date ASC LIMIT 1", $date_of_first_comment, $post_title );
+				//$query = $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_title = %s AND post_status = 'publish' AND post_type = 'post' ORDER BY post_date LIMIT 1", $post_title );
 				
 				if( $results = $wpdb->get_results( $query ) )
 					$comment_postID = $results[0]->ID;
@@ -107,16 +140,12 @@ function id_xml_importer_import_comment() {
 					 * Tell the user that we have got a post
 					 * We will use the get_permalink
 					 */
-					
 					$post_permalink = get_permalink( $comment_postID );
 					
-					echo "\n" . sprintf( __( 'Found the post on your blog <a href="%1$s" title="%2$s">Link to post</a>', 'id-import-xml' ), $post_permalink, $post_title ) . "\n";
+					echo "\n\t<small>" . sprintf( __( 'Found the post on your blog <a href="%1$s" title="%2$s">Link to post</a>', 'id-import-xml' ), $post_permalink, $post_title ) . "</small>\n";
 					/* Loop through all comments for each blogpost */
 					foreach ( $post->comments->comment as $comment ) {
 						
-						/* Increment the per_post_total_comment */
-						$per_post_total_comment++;
-						$total_comment++;
 						
 						/* Actually insert the comment into WordPress */
 						$commentdata['user_id']			= 0;
@@ -155,7 +184,7 @@ function id_xml_importer_import_comment() {
 					$post_count++;
 				}
 				else {
-					echo "\n" . __( 'Sorry... Could not find a post for this title', 'id-xml-import' ) . "\n";
+					echo "\n\t<small>" . __( 'Sorry... Could not find a post for this title', 'id-xml-import' ) . "</small>\n";
 				}
 				
 				echo "\t" . sprintf( __ngettext( 'Imported %1$d/%2$d comment for this post', 'Imported %1$d/%2$d comments for this post', $per_post_comment_count, 'id-xml-import' ), $per_post_comment_count, $per_post_total_comment );
@@ -188,13 +217,20 @@ function id_xml_importer_import_comment() {
 		<li><?php _e( 'Under Tools click on XML Export [from the left sidebar] and download the complete backup.', 'id-xml-import' ); ?></li>
 		<li><?php _e( 'Upload the XML file from your pc using the form below! And rest will be taken care of.', 'id-xml-import' ); ?></li>
 		<li><?php _e( 'If you want to test the output then just tick the simulation button. It will not actually insert something to database then.', 'id-xml-import' ); ?></li>
+		<li><?php _e( 'The Intelligent Search match will search the title using MySQL LIKE, where as exact match will use exactly the title given by the XML. As Intense Debate truncates the title so it is better to use Intelligent Title match', 'id-xml-import' ); ?></li>
 	</ol>
 	
 	<p><?php _e( 'Howdy! Just use the form below to upload the XML file! Rest would be done automatically!', 'id-xml-import' ); ?></p>
 
 	<form method="post" enctype="multipart/form-data">
 		<p><label for="id_xml" style="width:200px;display:block;float:left; font-weight: bold;"><?php _e( 'The Intense Debate XML file:', 'id-xml-import' ); ?></label> <input type="file" name="id_xml" id="id_xml" /></p>
-		<p><label for="id_xml_sim" style="widows: 200px; display: block; float: left; font-weight: bold;"><?php _e('Simulation Mode:', 'id-xml-import'); ?></label> <input type="checkbox" name="id_xml_sim" id="id_xml_sim" value="1" /> <small><?php _e('No Comments would be actually imported', 'id-xml-import'); ?></small></p>
+		<p><label for="id_xml_sim" style="width: 200px; display: block; float: left; font-weight: bold;"><?php _e('Simulation Mode:', 'id-xml-import'); ?></label> <input type="checkbox" name="id_xml_sim" id="id_xml_sim" value="1" /> <small><?php _e('No Comments would be actually imported', 'id-xml-import'); ?></small></p>
+		<p><label for="id_xml_op" style="width: 200px; display: block; float: left; font-weight: bold;">Title Matching method: </label>
+			<select id="id_xml_op" name="id_xml_op">
+				<option value="1"><?php _e('Exact Title match', 'id-xml-import'); ?></option>
+				<option selected="selected" value="2"><?php _e('Intelligent Title match', 'id-xml-import'); ?></option>
+			</select>
+		</p>
 		<p><input class="button-primary" type="submit" name="sub" value="<?php esc_attr_e( 'Start Import', 'id-xml-import' ); ?>" /><br /><br />
 		<small><?php printf( __( '<b>Note:</b> This may take a while (or might break!) if you have a lot of comments. Get your Intense Debate Comment Export XML file from <a href="%s" target="_blank">here</a>.', 'id-xml-import' ), 'http://intensedebate.com/' ); ?></small>
 	</form>
