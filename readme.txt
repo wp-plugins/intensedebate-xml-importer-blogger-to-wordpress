@@ -1,5 +1,5 @@
 === IntenseDebate XML Importer (Blogger to Wordpress) ===
-Contributors: Swashata, GautamGupta
+Contributors: swashata, GautamGupta
 Donate link: http://www.intechgrity.com/about/buy-us-some-beer/
 Tags: intense debate, import, importer, blogger, wordpress
 Requires at least: 2.8
